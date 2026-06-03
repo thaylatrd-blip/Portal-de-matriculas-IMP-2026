@@ -45,66 +45,70 @@
     </div>
   </section>
 
-  <section class="box">
-    <h2>Pesquisar Aluno</h2>
+ <section class="box">
+  <h2>Pesquisar Aluno</h2>
 
-    <div class="grid-2">
-      <input type="text" id="searchInput" placeholder="Digite o nome do aluno">
+  <div class="grid-2">
+    <input type="text" id="searchInput" placeholder="Digite o nome do aluno">
 
-      <select id="filtroPesquisaModalidade">
-        <option value="">Todas as modalidades</option>
-      </select>
-    </div>
-
-    <div class="botoes">
-      <button onclick="searchStudent()">Pesquisar</button>
-      <button class="btn-limpar" onclick="clearSearch()">Limpar</button>
-    </div>
-  </section>
-
-  <section id="studentBox" class="box hidden">
-    <h2>Dados do Aluno</h2>
-
-    <input type="hidden" id="linha">
-
-    <label>Nome</label>
-    <input id="nome" disabled>
-
-    <label>Modalidade</label>
-    <input id="modalidade" disabled>
-
-    <label>Turma Identificada</label>
-    <input id="turmaIdentificada" disabled>
-
-    <label>Validação Final</label>
-    <input id="validacaoFinal" disabled>
-
-    <label>Matrícula</label>
-    <select id="matricula">
-      <option value="">Selecione</option>
-      <option>Agendada</option>
-      <option>Efetivada</option>
-      <option>Pendente</option>
-      <option>Não compareceu</option>
-      <option>Desistente</option>
+    <select id="filtroPesquisaModalidade">
+      <option value="">Todas as modalidades</option>
     </select>
+  </div>
 
-    <label>Documentação</label>
-    <select id="documentacao">
-      <option value="">Selecione</option>
-      <option>Completa</option>
-      <option>Pendente</option>
-      <option>Incompleta</option>
-    </select>
+  <div class="botoes">
+    <button onclick="searchStudent()">Pesquisar</button>
+    <button class="btn-limpar" onclick="clearSearch()">Limpar</button>
+    <button onclick="newStudent()">Adicionar aluno avulso</button>
+  </div>
 
-    <label>Turma Final</label>
-    <select id="turmaFinal"></select>
+  <div id="searchResults"></div>
+</section>
 
-    <label>Observação</label>
-    <textarea id="observacao" rows="3"></textarea>
+ <section id="studentBox" class="box hidden">
+  <h2 id="formTitle">Dados do Aluno</h2>
 
-    <button onclick="saveStudent()">Salvar Alterações</button>
-  </section>
+  <input type="hidden" id="linha">
+  <input type="hidden" id="modoFormulario" value="editar">
+
+  <label>Nome</label>
+  <input id="nome">
+
+  <label>Modalidade</label>
+  <input id="modalidade">
+
+  <label>Turma Identificada</label>
+  <input id="turmaIdentificada">
+
+  <label>Validação Final</label>
+  <input id="validacaoFinal">
+
+  <label>Matrícula</label>
+  <select id="matricula">
+    <option value="">Selecione</option>
+    <option>Agendada</option>
+    <option>Efetivada</option>
+    <option>Pendente</option>
+    <option>Não compareceu</option>
+    <option>Desistente</option>
+  </select>
+
+  <label>Documentação</label>
+  <select id="documentacao">
+    <option value="">Selecione</option>
+    <option>Completa</option>
+    <option>Pendente</option>
+    <option>Incompleta</option>
+  </select>
+
+  <label>Turma Final</label>
+  <select id="turmaFinal"></select>
+
+  <label>Observação</label>
+  <textarea id="observacao" rows="3"></textarea>
+
+  <button onclick="saveStudent()">Salvar Alterações</button>
+</section>
 
 <section class="box">
   <div class="section-header">
