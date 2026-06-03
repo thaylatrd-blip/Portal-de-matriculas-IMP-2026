@@ -1,0 +1,498 @@
+const API_URL = "https://script.google.com/macros/s/AKfycbyEhEfPtpQOg9XDkr3MtzJNMH0Fd7Pk5rFH85oPgvkqtrDS1uoz_CPpKXcOMBvr3ucArA/exec";
+
+let alunos = [];
+
+const turmas = [
+  { modalidade: "Dança", nome: "Dança Matutino - Sexta 08:00 às 10:30 - Dança 2", vagas: 12 },
+  { modalidade: "Dança", nome: "Dança Matutino - Ter/Qui 08:30 às 09:20 - Dança 1", vagas: 12 },
+  { modalidade: "Dança", nome: "Dança Matutino - Ter/Qui 09:30 às 10:20 - Preparatório", vagas: 12 },
+  { modalidade: "Dança", nome: "Dança Matutino - Ter/Qui 10:30 às 11:15 - Baby Class", vagas: 14 },
+  { modalidade: "Dança", nome: "Dança Vespertino - Ter/Qui 14:00 às 14:50 - Preparatório", vagas: 12 },
+  { modalidade: "Dança", nome: "Dança Vespertino - Ter/Qui 15:00 às 15:45 - Baby Class", vagas: 14 },
+  { modalidade: "Dança", nome: "Dança Vespertino - Ter/Qui 16:00 às 16:50 - Dança 1", vagas: 12 },
+  { modalidade: "Dança", nome: "Dança Vespertino - Ter/Qui/Sex 17:00 às 17:50 - Dança 2", vagas: 12 },
+
+  { modalidade: "Ginástica", nome: "Ginástica Matutino - Ter/Qui 07:30 às 08:20", vagas: 30 },
+  { modalidade: "Ginástica", nome: "Ginástica Noturno - Seg/Qua/Sex 18:00 às 18:50", vagas: 35 },
+  { modalidade: "Ginástica", nome: "Ginástica Noturno - Seg/Qua/Sex 19:00 às 19:50", vagas: 35 },
+
+  { modalidade: "Futsal", nome: "Futsal Matutino - Seg/Qua/Sex 07:30 às 08:20", vagas: 10 },
+  { modalidade: "Futsal", nome: "Futsal Matutino - Seg/Qua/Sex 08:30 às 09:20", vagas: 10 },
+  { modalidade: "Futsal", nome: "Futsal Matutino - Seg/Qua/Sex 09:30 às 10:20", vagas: 10 },
+  { modalidade: "Futsal", nome: "Futsal Vespertino - Seg/Qua/Sex 16:00 às 17:00", vagas: 20 },
+  { modalidade: "Futsal", nome: "Futsal Vespertino - Seg/Qua/Sex 17:00 às 18:00", vagas: 30 },
+
+  { modalidade: "Jiu-Jitsu", nome: "Jiu-Jitsu Matutino - Qua/Qui 08:00 às 08:50", vagas: 16 },
+  { modalidade: "Jiu-Jitsu", nome: "Jiu-Jitsu Vespertino - Qua/Qui 14:00 às 14:50", vagas: 16 },
+  { modalidade: "Jiu-Jitsu", nome: "Jiu-Jitsu Noturno - Ter/Qua/Qui 18:00 às 18:50", vagas: 16 },
+  { modalidade: "Jiu-Jitsu", nome: "Jiu-Jitsu Noturno - Ter/Qua/Qui 19:00 às 19:50", vagas: 17 },
+
+  { modalidade: "Judô", nome: "Judô Matutino - Seg/Qua/Sex 08:00 às 09:50", vagas: 15 },
+  { modalidade: "Judô", nome: "Judô Matutino - Seg/Qua/Sex 10:00 às 10:50", vagas: 15 },
+  { modalidade: "Judô", nome: "Judô Vespertino - Seg/Qua/Sex 14:00 às 14:50", vagas: 15 },
+  { modalidade: "Judô", nome: "Judô Vespertino - Seg/Qua/Sex 15:00 às 16:50", vagas: 15 }
+];
+
+function normalizeText(text) {
+  return String(text || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+function getValue(obj, names) {
+  const keys = Object.keys(obj);
+
+  for (const name of names) {
+    const foundKey = keys.find(k => normalizeText(k) === normalizeText(name));
+    if (foundKey) return obj[foundKey];
+  }
+
+  return "";
+}
+
+function isListaEspera(valor) {
+  const texto = normalizeText(valor);
+
+  return (
+    texto.includes("lista de espera") ||
+    texto.includes("cadastro reserva") ||
+    texto.includes("reserva")
+  );
+}
+
+function isClassificado(valor) {
+  const texto = normalizeText(valor);
+  return texto.includes("classificado");
+}
+
+async function loadData() {
+  try {
+    const response = await fetch(API_URL);
+    alunos = await response.json();
+
+    fillTurmaSelect();
+    fillFilters();
+    updateDashboard();
+    renderTurmas();
+  } catch (error) {
+    alert("Erro ao carregar os dados. Verifique a URL do Apps Script.");
+    console.error(error);
+  }
+}
+
+function fillTurmaSelect() {
+  const select = document.getElementById("turmaFinal");
+  select.innerHTML = '<option value="">Selecione a turma</option>';
+
+  turmas.forEach(turma => {
+    const option = document.createElement("option");
+    option.value = turma.nome;
+    option.textContent = turma.nome;
+    select.appendChild(option);
+  });
+}
+
+function fillFilters() {
+  const modalidadeSelect = document.getElementById("filtroModalidade");
+  const turmaSelect = document.getElementById("filtroTurma");
+  const pesquisaModalidade = document.getElementById("filtroPesquisaModalidade");
+
+  const modalidadesPadrao = ["Dança", "Ginástica", "Futsal", "Jiu-Jitsu", "Judô"];
+
+  modalidadeSelect.innerHTML = '<option value="">Todas as modalidades</option>';
+  turmaSelect.innerHTML = '<option value="">Todas as turmas</option>';
+  pesquisaModalidade.innerHTML = '<option value="">Todas as modalidades</option>';
+
+  modalidadesPadrao.forEach(m => {
+    modalidadeSelect.innerHTML += `<option value="${m}">${m}</option>`;
+    pesquisaModalidade.innerHTML += `<option value="${m}">${m}</option>`;
+  });
+
+  turmas.forEach(turma => {
+    turmaSelect.innerHTML += `<option value="${turma.nome}">${turma.nome}</option>`;
+  });
+}
+
+function updateDashboard() {
+  document.getElementById("totalAlunos").textContent = alunos.length;
+
+  const classificados = alunos.filter(a =>
+    isClassificado(getValue(a, ["Validação Final", "Validacao Final", "Status"]))
+  ).length;
+
+  const efetivadas = alunos.filter(a =>
+    normalizeText(getValue(a, ["Matrícula", "Matricula"])) === "efetivada"
+  ).length;
+
+  const pendentes = alunos.filter(a => {
+    const matricula = normalizeText(getValue(a, ["Matrícula", "Matricula"]));
+    const documentacao = normalizeText(getValue(a, ["Documentação", "Documentacao"]));
+
+    return (
+      matricula === "pendente" ||
+      documentacao === "pendente" ||
+      documentacao === "incompleta"
+    );
+  }).length;
+
+  const espera = alunos.filter(a =>
+    isListaEspera(getValue(a, ["Validação Final", "Validacao Final", "Status"]))
+  ).length;
+
+  if (document.getElementById("totalClassificados")) {
+    document.getElementById("totalClassificados").textContent = classificados;
+  }
+
+  document.getElementById("totalEfetivadas").textContent = efetivadas;
+  document.getElementById("totalPendentes").textContent = pendentes;
+  document.getElementById("totalEspera").textContent = espera;
+}
+
+function renderTurmas() {
+  const container = document.getElementById("turmasContainer");
+  const filtro = document.getElementById("filtroTurmaModalidade")?.value || "";
+
+  container.innerHTML = "";
+
+  const turmasFiltradas = filtro
+    ? turmas.filter(t => t.modalidade === filtro)
+    : turmas;
+
+  let totalVagas = 0;
+  let totalOcupadas = 0;
+
+  turmasFiltradas.forEach(turma => {
+    totalVagas += turma.vagas;
+
+    const ocupadas = alunos.filter(a =>
+      getValue(a, ["Turma Final"]) === turma.nome &&
+      normalizeText(getValue(a, ["Matrícula", "Matricula"])) === "efetivada"
+    ).length;
+
+    totalOcupadas += ocupadas;
+
+    const disponiveis = turma.vagas - ocupadas;
+    const percentual = turma.vagas > 0
+      ? Math.min((ocupadas / turma.vagas) * 100, 100)
+      : 0;
+
+    let status = "DISPONÍVEL";
+    let classe = "status-disponivel";
+
+    if (disponiveis <= 0) {
+      status = "LOTADA";
+      classe = "status-lotada";
+    } else if (disponiveis <= 3) {
+      status = "ATENÇÃO";
+      classe = "status-atencao";
+    }
+
+    container.innerHTML += `
+      <div class="turma-card">
+        <div class="turma-topo">
+          <h3>${turma.nome}</h3>
+          <span class="turma-modalidade">${turma.modalidade}</span>
+        </div>
+
+        <div class="turma-info">
+          <div>
+            <strong>${turma.vagas}</strong>
+            <small>Vagas</small>
+          </div>
+          <div>
+            <strong>${ocupadas}</strong>
+            <small>Ocupadas</small>
+          </div>
+          <div>
+            <strong>${disponiveis}</strong>
+            <small>Livres</small>
+          </div>
+        </div>
+
+        <div class="barra">
+          <div class="progresso" style="width:${percentual}%"></div>
+        </div>
+
+        <span class="status-turma ${classe}">${status}</span>
+      </div>
+    `;
+  });
+
+  const totalDisponiveis = totalVagas - totalOcupadas;
+  const percentualGeral = totalVagas > 0
+    ? Math.round((totalOcupadas / totalVagas) * 100)
+    : 0;
+
+  if (document.getElementById("totalVagasProjeto")) {
+    document.getElementById("totalVagasProjeto").textContent = totalVagas;
+  }
+
+  if (document.getElementById("totalOcupadasProjeto")) {
+    document.getElementById("totalOcupadasProjeto").textContent = totalOcupadas;
+  }
+
+  if (document.getElementById("totalDisponiveisProjeto")) {
+    document.getElementById("totalDisponiveisProjeto").textContent = totalDisponiveis;
+  }
+
+  if (document.getElementById("percentualOcupacaoProjeto")) {
+    document.getElementById("percentualOcupacaoProjeto").textContent = percentualGeral + "%";
+  }
+}
+
+function searchStudent() {
+  const termo = normalizeText(document.getElementById("searchInput").value);
+  const modalidadeFiltro = document.getElementById("filtroPesquisaModalidade").value;
+
+  if (!termo && !modalidadeFiltro) {
+    alert("Digite o nome do aluno ou selecione uma modalidade.");
+    return;
+  }
+
+  const resultados = alunos.filter(a => {
+    const nome = normalizeText(getValue(a, [
+      "Nome do candidato",
+      "Nome do aluno",
+      "Nome",
+      "Aluno",
+      "Candidato"
+    ]));
+
+    const modalidade = normalizeText(getValue(a, ["Modalidade"]));
+
+    return nome.includes(termo) &&
+      (!modalidadeFiltro || modalidade.includes(normalizeText(modalidadeFiltro)));
+  });
+
+  if (resultados.length === 0) {
+    alert("Aluno não encontrado.");
+    return;
+  }
+
+  const aluno = resultados[0];
+
+  document.getElementById("studentBox").classList.remove("hidden");
+
+  document.getElementById("linha").value = aluno.linha;
+  document.getElementById("nome").value = getValue(aluno, [
+    "Nome do candidato",
+    "Nome do aluno",
+    "Nome",
+    "Aluno",
+    "Candidato"
+  ]);
+
+  document.getElementById("modalidade").value = getValue(aluno, ["Modalidade"]);
+  document.getElementById("turmaIdentificada").value = getValue(aluno, [
+    "Turma identificada",
+    "Turma Identificada"
+  ]);
+  document.getElementById("validacaoFinal").value = getValue(aluno, [
+    "Validação Final",
+    "Validacao Final",
+    "Status"
+  ]);
+  document.getElementById("matricula").value = getValue(aluno, [
+    "Matrícula",
+    "Matricula"
+  ]);
+  document.getElementById("documentacao").value = getValue(aluno, [
+    "Documentação",
+    "Documentacao"
+  ]);
+  document.getElementById("turmaFinal").value = getValue(aluno, ["Turma Final"]);
+  document.getElementById("observacao").value = getValue(aluno, [
+    "Observação",
+    "Observacao"
+  ]);
+}
+
+async function saveStudent() {
+  const linha = document.getElementById("linha").value;
+
+  if (!linha) {
+    alert("Pesquise um aluno antes de salvar.");
+    return;
+  }
+
+  const payload = {
+    linha: linha,
+    "Matrícula": document.getElementById("matricula").value,
+    "Documentação": document.getElementById("documentacao").value,
+    "Turma Final": document.getElementById("turmaFinal").value,
+    "Observação": document.getElementById("observacao").value,
+    "Data Matrícula": new Date().toLocaleDateString("pt-BR")
+  };
+
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      alert("Atualização realizada com sucesso.");
+      await loadData();
+      clearSearch();
+    } else {
+      alert("Erro ao atualizar aluno.");
+    }
+  } catch (error) {
+    alert("Erro ao salvar. Verifique o Apps Script.");
+    console.error(error);
+  }
+}
+
+function clearSearch() {
+  document.getElementById("searchInput").value = "";
+  document.getElementById("filtroPesquisaModalidade").value = "";
+  document.getElementById("studentBox").classList.add("hidden");
+}
+
+function clearFilters() {
+  document.getElementById("filtroModalidade").value = "";
+  document.getElementById("filtroTurma").value = "";
+  document.getElementById("filtroSituacao").value = "";
+  document.getElementById("reportResult").innerHTML = "";
+}
+
+function getFilteredReport() {
+  const modalidade = document.getElementById("filtroModalidade").value;
+  const turma = document.getElementById("filtroTurma").value;
+  const situacao = document.getElementById("filtroSituacao").value;
+
+  return alunos.filter(a => {
+    const mod = normalizeText(getValue(a, ["Modalidade"]));
+    const turmaFinal = getValue(a, ["Turma Final"]);
+    const matricula = normalizeText(getValue(a, ["Matrícula", "Matricula"]));
+    const validacao = getValue(a, ["Validação Final", "Status"]);
+
+    const situacaoNormalizada = normalizeText(situacao);
+
+    return (
+      (!modalidade || mod.includes(normalizeText(modalidade))) &&
+      (!turma || turmaFinal === turma) &&
+      (
+        !situacao ||
+        matricula === situacaoNormalizada ||
+        normalizeText(validacao) === situacaoNormalizada ||
+        (situacaoNormalizada === "lista de espera" && isListaEspera(validacao)) ||
+        (situacaoNormalizada === "cadastro reserva" && isListaEspera(validacao))
+      )
+    );
+  });
+}
+
+function showReport() {
+  const dados = getFilteredReport();
+
+  if (dados.length === 0) {
+    document.getElementById("reportResult").innerHTML = "<p>Nenhum resultado encontrado.</p>";
+    return;
+  }
+
+  let html = `
+    <h3>Resultado: ${dados.length} aluno(s)</h3>
+    <div style="overflow-x:auto;">
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Modalidade</th>
+          <th>Turma Final</th>
+          <th>Matrícula</th>
+          <th>Documentação</th>
+          <th>Validação</th>
+          <th>Observação</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  dados.forEach(a => {
+    html += `
+      <tr>
+        <td>${getValue(a, ["Nome do candidato", "Nome do aluno", "Nome", "Aluno", "Candidato"])}</td>
+        <td>${getValue(a, ["Modalidade"])}</td>
+        <td>${getValue(a, ["Turma Final"])}</td>
+        <td>${getValue(a, ["Matrícula", "Matricula"])}</td>
+        <td>${getValue(a, ["Documentação", "Documentacao"])}</td>
+        <td>${getValue(a, ["Validação Final", "Status"])}</td>
+        <td>${getValue(a, ["Observação", "Observacao"])}</td>
+      </tr>
+    `;
+  });
+
+  html += "</tbody></table></div>";
+  document.getElementById("reportResult").innerHTML = html;
+}
+
+function downloadExcel() {
+  const dados = getFilteredReport();
+
+  if (dados.length === 0) {
+    alert("Nenhum dado para exportar.");
+    return;
+  }
+
+  const planilha = dados.map(a => ({
+    Classificacao: getValue(a, ["Classificação", "Classificacao"]),
+    Nome: getValue(a, ["Nome do candidato", "Nome do aluno", "Nome", "Aluno", "Candidato"]),
+    Modalidade: getValue(a, ["Modalidade"]),
+    Turma_Identificada: getValue(a, ["Turma identificada", "Turma Identificada"]),
+    Turma_Final: getValue(a, ["Turma Final"]),
+    Matricula: getValue(a, ["Matrícula", "Matricula"]),
+    Documentacao: getValue(a, ["Documentação", "Documentacao"]),
+    Validacao_Final: getValue(a, ["Validação Final", "Status"]),
+    Observacao: getValue(a, ["Observação", "Observacao"])
+  }));
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(planilha);
+
+  XLSX.utils.book_append_sheet(wb, ws, "Relatório Matrículas");
+  XLSX.writeFile(wb, "relatorio_matriculas_imp.xlsx");
+}
+
+function downloadPDF() {
+  const dados = getFilteredReport();
+
+  if (dados.length === 0) {
+    alert("Nenhum dado para exportar.");
+    return;
+  }
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF("landscape");
+
+  doc.setFontSize(16);
+  doc.text("Relatório de Matrículas - IMP 2026", 14, 15);
+
+  doc.setFontSize(10);
+  doc.text(`Total de registros: ${dados.length}`, 14, 23);
+
+  const linhas = dados.map(a => [
+    getValue(a, ["Nome do candidato", "Nome do aluno", "Nome", "Aluno", "Candidato"]),
+    getValue(a, ["Modalidade"]),
+    getValue(a, ["Turma Final"]),
+    getValue(a, ["Matrícula", "Matricula"]),
+    getValue(a, ["Documentação", "Documentacao"]),
+    getValue(a, ["Validação Final", "Status"])
+  ]);
+
+  doc.autoTable({
+    head: [["Nome", "Modalidade", "Turma Final", "Matrícula", "Documentação", "Validação"]],
+    body: linhas,
+    startY: 30,
+    styles: { fontSize: 8 },
+    headStyles: { fillColor: [168, 0, 0] }
+  });
+
+  doc.save("relatorio_matriculas_imp.pdf");
+}
+
+loadData();
