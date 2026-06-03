@@ -674,3 +674,35 @@ button:hover {
   background: #fde8e8;
   color: #b00020;
 }
+
+.search-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.search-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-left: 6px solid var(--laranja);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+}
+
+.search-card strong {
+  color: var(--azul);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.search-card p {
+  margin: 5px 0;
+  font-size: 13px;
+}
+
+.search-card button {
+  margin-top: 10px;
+  width: 100%;
+}
