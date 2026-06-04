@@ -71,41 +71,59 @@
   <input type="hidden" id="linha">
   <input type="hidden" id="modoFormulario" value="editar">
 
-  <label>Nome</label>
-  <input id="nome">
+  <div class="form-grid-aluno">
+    <div class="form-full">
+      <label>Nome</label>
+      <input id="nome">
+    </div>
 
-  <label>Modalidade</label>
-  <input id="modalidade">
+    <div>
+      <label>Modalidade</label>
+      <input id="modalidade">
+    </div>
 
-  <label>Turma Identificada</label>
-  <input id="turmaIdentificada">
+    <div>
+      <label>Turma Identificada</label>
+      <input id="turmaIdentificada">
+    </div>
 
-  <label>Validação Final</label>
-  <input id="validacaoFinal">
+    <div>
+      <label>Validação Final</label>
+      <input id="validacaoFinal">
+    </div>
 
-  <label>Matrícula</label>
-  <select id="matricula">
-    <option value="">Selecione</option>
-    <option>Agendada</option>
-    <option>Efetivada</option>
-    <option>Pendente</option>
-    <option>Não compareceu</option>
-    <option>Desistente</option>
-  </select>
+    <div>
+      <label>Matrícula</label>
+      <select id="matricula">
+        <option value="">Selecione</option>
+        <option>Agendada</option>
+        <option>Efetivada</option>
+        <option>Pendente</option>
+        <option>Não compareceu</option>
+        <option>Desistente</option>
+      </select>
+    </div>
 
-  <label>Documentação</label>
-  <select id="documentacao">
-    <option value="">Selecione</option>
-    <option>Completa</option>
-    <option>Pendente</option>
-    <option>Incompleta</option>
-  </select>
+    <div>
+      <label>Documentação</label>
+      <select id="documentacao">
+        <option value="">Selecione</option>
+        <option>Completa</option>
+        <option>Pendente</option>
+        <option>Incompleta</option>
+      </select>
+    </div>
 
-  <label>Turma Final</label>
-  <select id="turmaFinal"></select>
+    <div class="form-full">
+      <label>Turma Final</label>
+      <select id="turmaFinal"></select>
+    </div>
 
-  <label>Observação</label>
-  <textarea id="observacao" rows="3"></textarea>
+    <div class="form-full">
+      <label>Observação</label>
+      <textarea id="observacao" rows="3"></textarea>
+    </div>
+  </div>
 
   <button onclick="saveStudent()">Salvar Alterações</button>
 </section>
