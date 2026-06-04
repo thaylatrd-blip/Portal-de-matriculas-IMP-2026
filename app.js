@@ -56,12 +56,15 @@ function getValue(obj, names) {
 
 function isListaEspera(valor) {
   const texto = normalizeText(valor);
-  return texto.includes("lista de espera") || texto.includes("cadastro reserva") || texto.includes("reserva");
+  return (
+    texto.includes("lista de espera") ||
+    texto.includes("cadastro reserva") ||
+    texto.includes("reserva")
+  );
 }
 
 function isClassificado(valor) {
-  const texto = normalizeText(valor);
-  return texto.includes("classificado");
+  return normalizeText(valor).includes("classificado");
 }
 
 async function loadData() {
@@ -118,8 +121,9 @@ function fillFilters() {
 }
 
 function updateDashboard() {
-  const totalAlunos = document.getElementById("totalAlunos");
-  if (totalAlunos) totalAlunos.textContent = alunos.length;
+  if (document.getElementById("totalAlunos")) {
+    document.getElementById("totalAlunos").textContent = alunos.length;
+  }
 
   const classificados = alunos.filter(a =>
     isClassificado(getValue(a, ["Validação Final", "Validacao Final", "Status"]))
@@ -132,7 +136,12 @@ function updateDashboard() {
   const pendentes = alunos.filter(a => {
     const matricula = normalizeText(getValue(a, ["Matrícula", "Matricula"]));
     const documentacao = normalizeText(getValue(a, ["Documentação", "Documentacao"]));
-    return matricula === "pendente" || documentacao === "pendente" || documentacao === "incompleta";
+
+    return (
+      matricula === "pendente" ||
+      documentacao === "pendente" ||
+      documentacao === "incompleta"
+    );
   }).length;
 
   const espera = alunos.filter(a =>
@@ -143,11 +152,25 @@ function updateDashboard() {
     normalizeText(getValue(a, ["Matrícula", "Matricula"])) === "desistente"
   ).length;
 
-  if (document.getElementById("totalClassificados")) document.getElementById("totalClassificados").textContent = classificados;
-  if (document.getElementById("totalEfetivadas")) document.getElementById("totalEfetivadas").textContent = efetivadas;
-  if (document.getElementById("totalPendentes")) document.getElementById("totalPendentes").textContent = pendentes;
-  if (document.getElementById("totalEspera")) document.getElementById("totalEspera").textContent = espera;
-  if (document.getElementById("totalDesistentes")) document.getElementById("totalDesistentes").textContent = desistentes;
+  if (document.getElementById("totalClassificados")) {
+    document.getElementById("totalClassificados").textContent = classificados;
+  }
+
+  if (document.getElementById("totalEfetivadas")) {
+    document.getElementById("totalEfetivadas").textContent = efetivadas;
+  }
+
+  if (document.getElementById("totalPendentes")) {
+    document.getElementById("totalPendentes").textContent = pendentes;
+  }
+
+  if (document.getElementById("totalEspera")) {
+    document.getElementById("totalEspera").textContent = espera;
+  }
+
+  if (document.getElementById("totalDesistentes")) {
+    document.getElementById("totalDesistentes").textContent = desistentes;
+  }
 }
 
 function renderTurmas() {
@@ -157,7 +180,9 @@ function renderTurmas() {
   const filtro = document.getElementById("filtroTurmaModalidade")?.value || "";
   container.innerHTML = "";
 
-  const turmasFiltradas = filtro ? turmas.filter(t => t.modalidade === filtro) : turmas;
+  const turmasFiltradas = filtro
+    ? turmas.filter(t => t.modalidade === filtro)
+    : turmas;
 
   let totalVagas = 0;
   let totalOcupadas = 0;
@@ -173,7 +198,9 @@ function renderTurmas() {
     totalOcupadas += ocupadas;
 
     const disponiveis = turma.vagas - ocupadas;
-    const percentual = turma.vagas > 0 ? Math.min((ocupadas / turma.vagas) * 100, 100) : 0;
+    const percentual = turma.vagas > 0
+      ? Math.min((ocupadas / turma.vagas) * 100, 100)
+      : 0;
 
     let status = "DISPONÍVEL";
     let classe = "status-disponivel";
@@ -209,12 +236,25 @@ function renderTurmas() {
   });
 
   const totalDisponiveis = totalVagas - totalOcupadas;
-  const percentualGeral = totalVagas > 0 ? Math.round((totalOcupadas / totalVagas) * 100) : 0;
+  const percentualGeral = totalVagas > 0
+    ? Math.round((totalOcupadas / totalVagas) * 100)
+    : 0;
 
-  if (document.getElementById("totalVagasProjeto")) document.getElementById("totalVagasProjeto").textContent = totalVagas;
-  if (document.getElementById("totalOcupadasProjeto")) document.getElementById("totalOcupadasProjeto").textContent = totalOcupadas;
-  if (document.getElementById("totalDisponiveisProjeto")) document.getElementById("totalDisponiveisProjeto").textContent = totalDisponiveis;
-  if (document.getElementById("percentualOcupacaoProjeto")) document.getElementById("percentualOcupacaoProjeto").textContent = percentualGeral + "%";
+  if (document.getElementById("totalVagasProjeto")) {
+    document.getElementById("totalVagasProjeto").textContent = totalVagas;
+  }
+
+  if (document.getElementById("totalOcupadasProjeto")) {
+    document.getElementById("totalOcupadasProjeto").textContent = totalOcupadas;
+  }
+
+  if (document.getElementById("totalDisponiveisProjeto")) {
+    document.getElementById("totalDisponiveisProjeto").textContent = totalDisponiveis;
+  }
+
+  if (document.getElementById("percentualOcupacaoProjeto")) {
+    document.getElementById("percentualOcupacaoProjeto").textContent = percentualGeral + "%";
+  }
 }
 
 function searchStudent() {
@@ -230,7 +270,14 @@ function searchStudent() {
   }
 
   const resultados = alunos.filter(a => {
-    const nome = normalizeText(getValue(a, ["Nome do candidato", "Nome do aluno", "Nome", "Aluno", "Candidato"]));
+    const nome = normalizeText(getValue(a, [
+      "Nome do candidato",
+      "Nome do aluno",
+      "Nome",
+      "Aluno",
+      "Candidato"
+    ]));
+
     const modalidade = normalizeText(getValue(a, ["Modalidade"]));
 
     return nome.includes(termo) &&
@@ -238,7 +285,9 @@ function searchStudent() {
   });
 
   if (resultados.length === 0) {
-    if (resultsBox) resultsBox.innerHTML = "<p>Nenhum aluno encontrado.</p>";
+    if (resultsBox) {
+      resultsBox.innerHTML = "<p>Nenhum aluno encontrado.</p>";
+    }
     return;
   }
 
@@ -266,7 +315,9 @@ function searchStudent() {
 
   html += "</div>";
 
-  if (resultsBox) resultsBox.innerHTML = html;
+  if (resultsBox) {
+    resultsBox.innerHTML = html;
+  }
 }
 
 function selectStudent(linha) {
@@ -282,14 +333,37 @@ function selectStudent(linha) {
   document.getElementById("studentBox").classList.remove("hidden");
 
   document.getElementById("linha").value = aluno.linha;
-  document.getElementById("nome").value = getValue(aluno, ["Nome do candidato", "Nome do aluno", "Nome", "Aluno", "Candidato"]);
+  document.getElementById("nome").value = getValue(aluno, [
+    "Nome do candidato",
+    "Nome do aluno",
+    "Nome",
+    "Aluno",
+    "Candidato"
+  ]);
+
   document.getElementById("modalidade").value = getValue(aluno, ["Modalidade"]);
-  document.getElementById("turmaIdentificada").value = getValue(aluno, ["Turma identificada", "Turma Identificada"]);
-  document.getElementById("validacaoFinal").value = getValue(aluno, ["Validação Final", "Validacao Final", "Status"]);
-  document.getElementById("matricula").value = getValue(aluno, ["Matrícula", "Matricula"]);
-  document.getElementById("documentacao").value = getValue(aluno, ["Documentação", "Documentacao"]);
+  document.getElementById("turmaIdentificada").value = getValue(aluno, [
+    "Turma identificada",
+    "Turma Identificada"
+  ]);
+  document.getElementById("validacaoFinal").value = getValue(aluno, [
+    "Validação Final",
+    "Validacao Final",
+    "Status"
+  ]);
+  document.getElementById("matricula").value = getValue(aluno, [
+    "Matrícula",
+    "Matricula"
+  ]);
+  document.getElementById("documentacao").value = getValue(aluno, [
+    "Documentação",
+    "Documentacao"
+  ]);
   document.getElementById("turmaFinal").value = getValue(aluno, ["Turma Final"]);
-  document.getElementById("observacao").value = getValue(aluno, ["Observação", "Observacao"]);
+  document.getElementById("observacao").value = getValue(aluno, [
+    "Observação",
+    "Observacao"
+  ]);
 }
 
 function newStudent() {
@@ -332,20 +406,26 @@ async function saveStudent() {
   };
 
   try {
-    const response = await fetch(API_URL, {
+    await fetch(API_URL, {
       method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
       body: JSON.stringify(payload)
     });
 
-    const result = await response.json();
+    alert(
+      modo === "adicionar"
+        ? "Aluno avulso enviado para cadastro."
+        : "Alteração enviada com sucesso."
+    );
 
-    if (result.success) {
-      alert(result.message || "Salvo com sucesso.");
+    setTimeout(async () => {
       await loadData();
       clearSearch();
-    } else {
-      alert("Erro ao salvar aluno.");
-    }
+    }, 1500);
+
   } catch (error) {
     alert("Erro ao salvar. Verifique o Apps Script.");
     console.error(error);
@@ -353,17 +433,39 @@ async function saveStudent() {
 }
 
 function clearSearch() {
-  if (document.getElementById("searchInput")) document.getElementById("searchInput").value = "";
-  if (document.getElementById("filtroPesquisaModalidade")) document.getElementById("filtroPesquisaModalidade").value = "";
-  if (document.getElementById("searchResults")) document.getElementById("searchResults").innerHTML = "";
-  if (document.getElementById("studentBox")) document.getElementById("studentBox").classList.add("hidden");
+  if (document.getElementById("searchInput")) {
+    document.getElementById("searchInput").value = "";
+  }
+
+  if (document.getElementById("filtroPesquisaModalidade")) {
+    document.getElementById("filtroPesquisaModalidade").value = "";
+  }
+
+  if (document.getElementById("searchResults")) {
+    document.getElementById("searchResults").innerHTML = "";
+  }
+
+  if (document.getElementById("studentBox")) {
+    document.getElementById("studentBox").classList.add("hidden");
+  }
 }
 
 function clearFilters() {
-  if (document.getElementById("filtroModalidade")) document.getElementById("filtroModalidade").value = "";
-  if (document.getElementById("filtroTurma")) document.getElementById("filtroTurma").value = "";
-  if (document.getElementById("filtroSituacao")) document.getElementById("filtroSituacao").value = "";
-  if (document.getElementById("reportResult")) document.getElementById("reportResult").innerHTML = "";
+  if (document.getElementById("filtroModalidade")) {
+    document.getElementById("filtroModalidade").value = "";
+  }
+
+  if (document.getElementById("filtroTurma")) {
+    document.getElementById("filtroTurma").value = "";
+  }
+
+  if (document.getElementById("filtroSituacao")) {
+    document.getElementById("filtroSituacao").value = "";
+  }
+
+  if (document.getElementById("reportResult")) {
+    document.getElementById("reportResult").innerHTML = "";
+  }
 }
 
 function getFilteredReport() {
@@ -375,7 +477,11 @@ function getFilteredReport() {
     const mod = normalizeText(getValue(a, ["Modalidade"]));
     const turmaFinal = getValue(a, ["Turma Final"]);
     const matricula = normalizeText(getValue(a, ["Matrícula", "Matricula"]));
-    const validacao = getValue(a, ["Validação Final", "Status", "Validacao Final"]);
+    const validacao = getValue(a, [
+      "Validação Final",
+      "Status",
+      "Validacao Final"
+    ]);
     const situacaoNormalizada = normalizeText(situacao);
 
     return (
