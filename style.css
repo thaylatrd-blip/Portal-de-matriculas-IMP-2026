@@ -706,3 +706,68 @@ button:hover {
   margin-top: 10px;
   width: 100%;
 }
+#studentBox {
+  border-top: 6px solid var(--vermelho);
+  background: linear-gradient(180deg, #ffffff, #fff8f4);
+}
+
+#studentBox h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--azul);
+}
+
+#studentBox h2::before {
+  content: "✏️";
+  font-size: 22px;
+}
+
+#studentBox label {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--azul);
+}
+
+#studentBox input,
+#studentBox select,
+#studentBox textarea {
+  background: #ffffff;
+  border: 1px solid #d6dce5;
+  border-radius: 12px;
+  padding: 12px;
+  font-size: 14px;
+}
+
+#studentBox input:focus,
+#studentBox select:focus,
+#studentBox textarea:focus {
+  outline: none;
+  border-color: var(--laranja);
+  box-shadow: 0 0 0 3px rgba(244, 91, 19, 0.15);
+}
+
+#studentBox button {
+  margin-top: 14px;
+  background: linear-gradient(135deg, var(--vermelho), var(--laranja));
+  padding: 14px 20px;
+  border-radius: 12px;
+}
+
+.form-grid-aluno {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.form-full {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 800px) {
+  .form-grid-aluno {
+    grid-template-columns: 1fr;
+  }
+}
