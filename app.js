@@ -174,11 +174,8 @@ function updateDashboard() {
 }
 
 function renderTurmas() {
- container.innerHTML += `
-<div class="turma-card turma-click"
-     onclick="showStudentsByTurma('${turma.nome}')">
-...
-`;
+  const container = document.getElementById("turmasContainer");
+  if (!container) return;
 
   const filtro = document.getElementById("filtroTurmaModalidade")?.value || "";
   container.innerHTML = "";
@@ -201,6 +198,7 @@ function renderTurmas() {
     totalOcupadas += ocupadas;
 
     const disponiveis = turma.vagas - ocupadas;
+
     const percentual = turma.vagas > 0
       ? Math.min((ocupadas / turma.vagas) * 100, 100)
       : 0;
@@ -216,17 +214,30 @@ function renderTurmas() {
       classe = "status-atencao";
     }
 
+    const nomeTurmaSeguro = turma.nome.replace(/'/g, "\\'");
+
     container.innerHTML += `
-      <div class="turma-card">
+      <div class="turma-card turma-click" onclick="showStudentsByTurma('${nomeTurmaSeguro}')">
         <div class="turma-topo">
           <h3>${turma.nome}</h3>
           <span class="turma-modalidade">${turma.modalidade}</span>
         </div>
 
         <div class="turma-info">
-          <div><strong>${turma.vagas}</strong><small>Vagas</small></div>
-          <div><strong>${ocupadas}</strong><small>Ocupadas</small></div>
-          <div><strong>${disponiveis}</strong><small>Livres</small></div>
+          <div>
+            <strong>${turma.vagas}</strong>
+            <small>Vagas</small>
+          </div>
+
+          <div>
+            <strong>${ocupadas}</strong>
+            <small>Ocupadas</small>
+          </div>
+
+          <div>
+            <strong>${disponiveis}</strong>
+            <small>Livres</small>
+          </div>
         </div>
 
         <div class="barra">
@@ -239,6 +250,7 @@ function renderTurmas() {
   });
 
   const totalDisponiveis = totalVagas - totalOcupadas;
+
   const percentualGeral = totalVagas > 0
     ? Math.round((totalOcupadas / totalVagas) * 100)
     : 0;
