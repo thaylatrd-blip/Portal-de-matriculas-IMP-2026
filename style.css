@@ -771,3 +771,12 @@ button:hover {
     grid-template-columns: 1fr;
   }
 }
+.turma-click{
+    cursor:pointer;
+    transition:.2s;
+}
+
+.turma-click:hover{
+    transform:translateY(-3px);
+    box-shadow:0 10px 20px rgba(0,0,0,.15);
+}
