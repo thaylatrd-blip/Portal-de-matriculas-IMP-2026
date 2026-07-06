@@ -13,235 +13,229 @@
 </head>
 
 <body>
+  <header class="topo">
+    <div>
+      <h1>Sistema de Matrículas IMP 2026</h1>
+      <p>Projeto Meninos do Pôr do Sol</p>
+    </div>
+  </header>
 
-<header class="topo">
-  <div>
-    <h1>Sistema de Matrículas IMP 2026</h1>
-    <p>Projeto Meninos do Pôr do Sol</p>
+  <main>
+    <section class="cards">
+      <div class="card">
+        <h3>Total de Inscritos</h3>
+        <span id="totalAlunos">0</span>
+      </div>
+
+      <div class="card">
+        <h3>Efetivadas</h3>
+        <span id="totalEfetivadas">0</span>
+      </div>
+
+      <div class="card">
+        <h3>Pendentes</h3>
+        <span id="totalPendentes">0</span>
+      </div>
+
+      <div class="card">
+        <h3>Lista de Espera</h3>
+        <span id="totalEspera">0</span>
+      </div>
+    </section>
+
+    <section class="box">
+      <h2>Pesquisar Aluno</h2>
+
+      <div class="grid-2">
+        <input type="text" id="searchInput" placeholder="Digite o nome do aluno">
+
+        <select id="filtroPesquisaModalidade">
+          <option value="">Todas as modalidades</option>
+        </select>
+      </div>
+
+      <div class="botoes">
+        <button onclick="searchStudent()">Pesquisar</button>
+        <button class="btn-limpar" onclick="clearSearch()">Limpar</button>
+        <button onclick="newStudent()">Adicionar aluno avulso</button>
+      </div>
+
+      <div id="searchResults"></div>
+    </section>
+
+    <section id="studentBox" class="box hidden">
+      <h2 id="formTitle">Dados do Aluno</h2>
+
+      <input type="hidden" id="linha">
+      <input type="hidden" id="modoFormulario" value="editar">
+
+      <div class="form-grid-aluno">
+        <div class="form-full">
+          <label>Nome</label>
+          <input id="nome">
+        </div>
+
+        <div>
+          <label>Modalidade</label>
+          <input id="modalidade">
+        </div>
+
+        <div>
+          <label>Turma Identificada</label>
+          <input id="turmaIdentificada">
+        </div>
+
+        <div>
+          <label>Validação Final</label>
+          <input id="validacaoFinal">
+        </div>
+
+        <div>
+          <label>Matrícula</label>
+          <select id="matricula">
+            <option value="">Selecione</option>
+            <option>Agendada</option>
+            <option>Efetivada</option>
+            <option>Pendente</option>
+            <option>Não compareceu</option>
+            <option>Desistente</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Documentação</label>
+          <select id="documentacao">
+            <option value="">Selecione</option>
+            <option>Completa</option>
+            <option>Pendente</option>
+            <option>Incompleta</option>
+          </select>
+        </div>
+
+        <div class="form-full">
+          <label>Turma Final</label>
+          <select id="turmaFinal"></select>
+        </div>
+
+        <div class="form-full">
+          <label>Observação</label>
+          <textarea id="observacao" rows="3"></textarea>
+        </div>
+      </div>
+
+      <button onclick="saveStudent()">Salvar Alterações</button>
+    </section>
+
+    <section class="box">
+      <div class="section-header">
+        <div>
+          <h2>Controle de Turmas</h2>
+          <p>Acompanhe a ocupação das vagas por modalidade e horário.</p>
+        </div>
+
+        <select id="filtroTurmaModalidade" onchange="renderTurmas()">
+          <option value="">Todas as modalidades</option>
+          <option>Dança</option>
+          <option>Ginástica</option>
+          <option>Futsal</option>
+          <option>Jiu-Jitsu</option>
+          <option>Judô</option>
+        </select>
+      </div>
+
+      <div class="turmas-resumo">
+        <div>
+          <span id="totalVagasProjeto">0</span>
+          <p>Vagas totais</p>
+        </div>
+        <div>
+          <span id="totalOcupadasProjeto">0</span>
+          <p>Ocupadas</p>
+        </div>
+        <div>
+          <span id="totalDisponiveisProjeto">0</span>
+          <p>Disponíveis</p>
+        </div>
+        <div>
+          <span id="percentualOcupacaoProjeto">0%</span>
+          <p>Ocupação geral</p>
+        </div>
+      </div>
+
+      <div id="turmasContainer" class="turmas-grid"></div>
+    </section>
+
+    <section class="box">
+      <h2>Relatórios</h2>
+
+      <div class="grid-3">
+        <select id="filtroModalidade">
+          <option value="">Todas as modalidades</option>
+        </select>
+
+        <select id="filtroTurma">
+          <option value="">Todas as turmas</option>
+        </select>
+
+        <select id="filtroSituacao">
+          <option value="">Todas as situações</option>
+          <option>Efetivada</option>
+          <option>Pendente</option>
+          <option>Agendada</option>
+          <option>Não Compareceu</option>
+          <option>Cadastro reserva</option>
+          <option>Desistente</option>
+        </select>
+
+        <select id="filtroDocumentacao">
+          <option value="">Todas as documentações</option>
+          <option>Completa</option>
+          <option>Pendente</option>
+          <option>Incompleta</option>
+        </select>
+      </div>
+
+      <div class="botoes">
+        <button onclick="showReport()">Ver Relatório</button>
+        <button onclick="downloadExcel()">Baixar Excel</button>
+        <button onclick="downloadPDF()">Baixar PDF</button>
+        <button class="btn-limpar" onclick="clearFilters()">Limpar Filtros</button>
+      </div>
+
+      <div id="reportResult"></div>
+    </section>
+  </main>
+
+  <footer>
+    Instituto Meninos do Pôr do Sol - IMP | Sistema de Matrículas 2026
+  </footer>
+
+  <div id="turmaModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h2 id="modalTurmaTitulo">Turma</h2>
+          <p id="modalTurmaResumo"></p>
+        </div>
+        <button class="btn-fechar" onclick="closeTurmaModal()" aria-label="Fechar">×</button>
+      </div>
+
+      <div class="modal-actions">
+        <button onclick="downloadTurmaExcel()">Baixar Excel</button>
+        <button onclick="printTurmaList()">Imprimir</button>
+      </div>
+
+      <div id="modalTurmaLista"></div>
+    </div>
   </div>
-</header>
 
-<main>
-
-  <section class="cards">
-    <div class="card">
-      <h3>Total de Inscritos</h3>
-      <span id="totalAlunos">0</span>
-    </div>
-
-    <div class="card">
-      <h3>Efetivadas</h3>
-      <span id="totalEfetivadas">0</span>
-    </div>
-
-    <div class="card">
-      <h3>Pendentes</h3>
-      <span id="totalPendentes">0</span>
-    </div>
-
-    <div class="card">
-      <h3>Lista de Espera</h3>
-      <span id="totalEspera">0</span>
-    </div>
-  </section>
-
- <section class="box">
-  <h2>Pesquisar Aluno</h2>
-
-  <div class="grid-2">
-    <input type="text" id="searchInput" placeholder="Digite o nome do aluno">
-
-    <select id="filtroPesquisaModalidade">
-      <option value="">Todas as modalidades</option>
-    </select>
-  </div>
-
-  <div class="botoes">
-    <button onclick="searchStudent()">Pesquisar</button>
-    <button class="btn-limpar" onclick="clearSearch()">Limpar</button>
-    <button onclick="newStudent()">Adicionar aluno avulso</button>
-  </div>
-
-  <div id="searchResults"></div>
-</section>
-
- <section id="studentBox" class="box hidden">
-  <h2 id="formTitle">Dados do Aluno</h2>
-
-  <input type="hidden" id="linha">
-  <input type="hidden" id="modoFormulario" value="editar">
-
-  <div class="form-grid-aluno">
-    <div class="form-full">
-      <label>Nome</label>
-      <input id="nome">
-    </div>
-
-    <div>
-      <label>Modalidade</label>
-      <input id="modalidade">
-    </div>
-
-    <div>
-      <label>Turma Identificada</label>
-      <input id="turmaIdentificada">
-    </div>
-
-    <div>
-      <label>Validação Final</label>
-      <input id="validacaoFinal">
-    </div>
-
-    <div>
-      <label>Matrícula</label>
-      <select id="matricula">
-        <option value="">Selecione</option>
-        <option>Agendada</option>
-        <option>Efetivada</option>
-        <option>Pendente</option>
-        <option>Não compareceu</option>
-        <option>Desistente</option>
-      </select>
-    </div>
-
-    <div>
-      <label>Documentação</label>
-      <select id="documentacao">
-        <option value="">Selecione</option>
-        <option>Completa</option>
-        <option>Pendente</option>
-        <option>Incompleta</option>
-      </select>
-    </div>
-
-    <div class="form-full">
-      <label>Turma Final</label>
-      <select id="turmaFinal"></select>
-    </div>
-
-    <div class="form-full">
-      <label>Observação</label>
-      <textarea id="observacao" rows="3"></textarea>
-    </div>
-  </div>
-
-  <button onclick="saveStudent()">Salvar Alterações</button>
-</section>
-
-<section class="box">
-  <div class="section-header">
-    <div>
-      <h2>Controle de Turmas</h2>
-      <p>Acompanhe a ocupação das vagas por modalidade e horário.</p>
-    </div>
-
-    <select id="filtroTurmaModalidade" onchange="renderTurmas()">
-      <option value="">Todas as modalidades</option>
-      <option>Dança</option>
-      <option>Ginástica</option>
-      <option>Futsal</option>
-      <option>Jiu-Jitsu</option>
-      <option>Judô</option>
-    </select>
-  </div>
-
-  <div class="turmas-resumo">
-    <div>
-      <span id="totalVagasProjeto">0</span>
-      <p>Vagas totais</p>
-    </div>
-    <div>
-      <span id="totalOcupadasProjeto">0</span>
-      <p>Ocupadas</p>
-    </div>
-    <div>
-      <span id="totalDisponiveisProjeto">0</span>
-      <p>Disponíveis</p>
-    </div>
-    <div>
-      <span id="percentualOcupacaoProjeto">0%</span>
-      <p>Ocupação geral</p>
-    </div>
-  </div>
-
-  <div id="turmasContainer" class="turmas-grid"></div>
-</section>
-
-  <section class="box">
-    <h2>Relatórios</h2>
-
-    <div class="grid-3">
-      <select id="filtroModalidade">
-        <option value="">Todas as modalidades</option>
-      </select>
-
-      <select id="filtroTurma">
-        <option value="">Todas as turmas</option>
-      </select>
-
-     <select id="filtroSituacao">
-  <option value="">Todas as situações</option>
-  <option>Efetivada</option>
-  <option>Pendente</option>
-  <option>Agendada</option>
-  <option>Não Compareceu</option>
-  <option>Cadastro reserva</option>
-  <option>Desistente</option>
-</select>
-    </div>
-
-    <div class="botoes">
-      <button onclick="showReport()">Ver Relatório</button>
-      <button onclick="downloadExcel()">Baixar Excel</button>
-      <button onclick="downloadPDF()">Baixar PDF</button>
-      <button class="btn-limpar" onclick="clearFilters()">Limpar Filtros</button>
-    </div>
-
-    <div id="reportResult"></div>
-  </section>
-
-</main>
-
-<footer>
-  Instituto Meninos do Pôr do Sol - IMP | Sistema de Matrículas 2026
-</footer>
-
-<script src="app.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/helpers.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/matriculas.js"></script>
+  <script src="js/turmas.js"></script>
+  <script src="js/relatorios.js"></script>
+  <script src="js/uniformes.js"></script>
+  <script src="app.js"></script>
 </body>
-</html><section class="box turma-controle">
-  <div class="section-title">
-    <h2>Controle de Turmas</h2>
-
-    <div class="turma-filtros">
-      <select id="filtroTurmaModalidade" onchange="renderTurmas()">
-        <option value="">Todas as modalidades</option>
-        <option>Dança</option>
-        <option>Ginástica</option>
-        <option>Futsal</option>
-        <option>Jiu-Jitsu</option>
-        <option>Judô</option>
-      </select>
-      <button class="btn-limpar" onclick="resetTurmaFilter()">Limpar filtro</button>
-    </div>
-  </div>
-
-  <div class="turma-status">
-    <div class="card-mini">
-      <span>Turmas Ativas</span>
-      <strong id="totalTurmasAtivas">0</strong>
-    </div>
-    <div class="card-mini">
-      <span>Vagas Disponíveis</span>
-      <strong id="totalVagas">0</strong>
-    </div>
-    <div class="card-mini">
-      <span>Alunos Matriculados</span>
-      <strong id="totalMatriculados">0</strong>
-    </div>
-  </div>
-
-  <div id="turmasContainer" class="turmas-grid">
-    <!-- cards de turma são inseridos aqui pelo JS -->
-  </div>
-</section>
-<body>
+</html>
