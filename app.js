@@ -174,7 +174,7 @@ function updateDashboard() {
 }
 
 function renderTurmas() {
-  const container.innerHTML += `
+ container.innerHTML += `
 <div class="turma-card turma-click"
      onclick="showStudentsByTurma('${turma.nome}')">
 ...
