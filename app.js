@@ -174,8 +174,11 @@ function updateDashboard() {
 }
 
 function renderTurmas() {
-  const container = document.getElementById("turmasContainer");
-  if (!container) return;
+  const container.innerHTML += `
+<div class="turma-card turma-click"
+     onclick="showStudentsByTurma('${turma.nome}')">
+...
+`;
 
   const filtro = document.getElementById("filtroTurmaModalidade")?.value || "";
   container.innerHTML = "";
@@ -605,6 +608,49 @@ function downloadPDF() {
   });
 
   doc.save("relatorio_matriculas_imp.pdf");
+}
+function showStudentsByTurma(nomeTurma) {
+  const alunosTurma = alunos.filter(a =>
+    getValue(a, ["Turma Final"]) === nomeTurma &&
+    normalizeText(getValue(a, ["Matrícula", "Matricula"])) === "efetivada"
+  );
+
+  let html = `
+    <h3>Alunos da turma: ${nomeTurma}</h3>
+    <p>Total: ${alunosTurma.length}</p>
+    <div style="overflow-x:auto;">
+      <table class="report-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Modalidade</th>
+            <th>Matrícula</th>
+            <th>Documentação</th>
+            <th>Observação</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  alunosTurma.forEach(a => {
+    html += `
+      <tr>
+        <td>${getValue(a, ["Nome do candidato", "Nome do aluno", "Nome", "Aluno", "Candidato"])}</td>
+        <td>${getValue(a, ["Modalidade"])}</td>
+        <td>${getValue(a, ["Matrícula", "Matricula"])}</td>
+        <td>${getValue(a, ["Documentação", "Documentacao"])}</td>
+        <td>${getValue(a, ["Observação", "Observacao"])}</td>
+      </tr>
+    `;
+  });
+
+  html += "</tbody></table></div>";
+
+  const box = document.getElementById("reportResult");
+  if (box) {
+    box.innerHTML = html;
+    box.scrollIntoView({ behavior: "smooth" });
+  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
