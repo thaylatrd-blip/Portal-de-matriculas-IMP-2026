@@ -665,6 +665,97 @@ function showStudentsByTurma(nomeTurma) {
   }
 }
 
+let turmaAtualModal = "";
+let alunosTurmaAtual = [];
+
+function showStudentsByTurma(nomeTurma) {
+  turmaAtualModal = nomeTurma;
+
+  alunosTurmaAtual = alunos.filter(a =>
+    getValue(a, ["Turma Final"]) === nomeTurma &&
+    normalizeText(getValue(a, ["Matrícula", "Matricula"])) === "efetivada"
+  );
+
+  const turmaInfo = turmas.find(t => t.nome === nomeTurma);
+  const vagas = turmaInfo ? turmaInfo.vagas : 0;
+  const ocupadas = alunosTurmaAtual.length;
+  const livres = vagas - ocupadas;
+
+  document.getElementById("modalTurmaTitulo").textContent = nomeTurma;
+  document.getElementById("modalTurmaResumo").textContent =
+    `${vagas} vagas | ${ocupadas} alunos matriculados | ${livres} vagas livres`;
+
+  let html = "";
+
+  if (alunosTurmaAtual.length === 0) {
+    html = "<p>Nenhum aluno efetivado nesta turma.</p>";
+  } else {
+    html = `
+      <div style="overflow-x:auto;">
+        <table class="report-table">
+          <thead>
+            <tr>
+              <th>Nº</th>
+              <th>Nome</th>
+              <th>Modalidade</th>
+              <th>Matrícula</th>
+              <th>Documentação</th>
+              <th>Observação</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    alunosTurmaAtual.forEach((a, index) => {
+      html += `
+        <tr>
+          <td>${index + 1}</td>
+          <td>${getValue(a, ["Nome do candidato", "Nome do aluno", "Nome", "Aluno", "Candidato"])}</td>
+          <td>${getValue(a, ["Modalidade"])}</td>
+          <td>${getValue(a, ["Matrícula", "Matricula"])}</td>
+          <td>${getValue(a, ["Documentação", "Documentacao"])}</td>
+          <td>${getValue(a, ["Observação", "Observacao"])}</td>
+        </tr>
+      `;
+    });
+
+    html += "</tbody></table></div>";
+  }
+
+  document.getElementById("modalTurmaLista").innerHTML = html;
+  document.getElementById("turmaModal").classList.remove("hidden");
+}
+
+function closeTurmaModal() {
+  document.getElementById("turmaModal").classList.add("hidden");
+}
+
+function downloadTurmaExcel() {
+  if (!alunosTurmaAtual.length) {
+    alert("Nenhum aluno para exportar.");
+    return;
+  }
+
+  const planilha = alunosTurmaAtual.map((a, index) => ({
+    Nº: index + 1,
+    Nome: getValue(a, ["Nome do candidato", "Nome do aluno", "Nome", "Aluno", "Candidato"]),
+    Modalidade: getValue(a, ["Modalidade"]),
+    Turma_Final: getValue(a, ["Turma Final"]),
+    Matricula: getValue(a, ["Matrícula", "Matricula"]),
+    Documentacao: getValue(a, ["Documentação", "Documentacao"]),
+    Observacao: getValue(a, ["Observação", "Observacao"])
+  }));
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(planilha);
+
+  XLSX.utils.book_append_sheet(wb, ws, "Alunos da Turma");
+  XLSX.writeFile(wb, `alunos_turma_${turmaAtualModal}.xlsx`);
+}
+
+function printTurmaList() {
+  window.print();
+}
 document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("searchInput");
 
